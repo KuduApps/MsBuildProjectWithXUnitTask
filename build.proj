@@ -1,15 +1,15 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="BuildAndPublish" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <PropertyGroup>
-    <ToolsPath>$(MSBuildThisFileDirectory)\tools\</ToolsPath>
-    <XunitPath>$(ToolsPath)xunit\</XunitPath>
-    <BUILDTEMP Condition=" '$(BUILDTEMP)'=='' ">$(MSBuildThisFileDirectory)\publishOutput</BUILDTEMP>
-    <SOURCE Condition=" '$(SOURCE)'=='' ">$(MSBuildThisFileDirectory)\</SOURCE>
+  <PropertyGroup>    
+    <DEPLOYMENT_SOURCE Condition=" '$(DEPLOYMENT_SOURCE)'=='' ">$(MSBuildThisFileDirectory)\</DEPLOYMENT_SOURCE>
+    <DEPLOYMENT_TARGET Condition=" '$(DEPLOYMENT_TARGET)'=='' ">$(MSBuildThisFileDirectory)\TargetOutput</DEPLOYMENT_TARGET>
+    <DEPLOYMENT_TEMP Condition=" '$(DEPLOYMENT_TEMP)'=='' ">$(MSBuildThisFileDirectory)\publishOutput</DEPLOYMENT_TEMP>    
     <SolutionDir>$(MSBuildThisFileDirectory)\</SolutionDir>
     <OutputPath>$(MSBuildThisFileDirectory)\BuildOutput\</OutputPath>
     <TestOutputPath>$(MSBuildThisFileDirectory)\TestBuildOutput\</TestOutputPath>
     <TestResultsPath>$(MSBuildThisFileDirectory)\TestResultsOutput\</TestResultsPath>
-    <DeployTarget Condition=" '$(DeployTarget)'=='' ">$(MSBuildThisFileDirectory)\TargetOutput</DeployTarget>
+    <ToolsPath>$(MSBuildThisFileDirectory)\tools\</ToolsPath>
+    <XunitPath>$(ToolsPath)xunit\</XunitPath>
   </PropertyGroup>
 
   <UsingTask AssemblyFile="$(XunitPath)xunit.runner.msbuild.dll"  TaskName="Xunit.Runner.MSBuild.xunit" />
@@ -42,10 +42,10 @@
   <Target Name ="BuildProjects" DependsOnTargets="$(BuildProjectDependsOn)">
     <MSBuild Projects="@(ProjectsToBuild)"
              Targets="pipelinePreDeployCopyAllFilesToOneFolder"
-             Properties="OutDir=$(BUILDTEMP)\;SolutionDir=$(SOURCE)"
+             Properties="OutDir=$(DEPLOYMENT_TEMP)\;SolutionDir=$(DEPLOYMENT_SOURCE)"
               />
     <MSBuild Projects="@(TestProjects)"
-             Properties="OutDir=$(TestOutputPath);SolutionDir=$(SOURCE)" />
+             Properties="OutDir=$(TestOutputPath);SolutionDir=$(DEPLOYMENT_SOURCE)" />
   </Target>
 
   <!-- TARGET: ExecuteTests-->
@@ -74,10 +74,10 @@
   <!-- target definition-->
   <Target Name="Publish" DependsOnTargets="$(PublishDependsOn)">
      <ItemGroup>
-      <FilesToCopy Include="$(BUILDTEMP)\_PublishedWebsites\MvcApp\**\*.*"/>
+      <FilesToCopy Include="$(DEPLOYMENT_TEMP)\_PublishedWebsites\MvcApp\**\*.*"/>
      </ItemGroup>
     <Copy SourceFiles="@(FilesToCopy)"
-          DestinationFiles="@(FilesToCopy->'$(DeployTarget)\%(RecursiveDir)%(Filename)%(Extension)')" />
+          DestinationFiles="@(FilesToCopy->'$(DEPLOYMENT_TARGET)\%(RecursiveDir)%(Filename)%(Extension)')" />
   </Target>
   
 </Project>

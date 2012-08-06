@@ -1,2 +1,2 @@
 [config]
-command = msbuild build.proj /p:DeployTarget="%TARGET%" 
+command = msbuild build.proj  
